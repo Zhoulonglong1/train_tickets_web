@@ -43,7 +43,7 @@
                             <i class="el-icon-star-on"></i>
                             <span>订单信息</span>
                         </template>
-                        <el-menu-item index="4-1">全部订单</el-menu-item>
+                        <el-menu-item index="4-1" @click="toAllOrder">全部订单</el-menu-item>
                         <el-menu-item index="4-2">未支付订单</el-menu-item>
                     </el-submenu>
 
@@ -54,7 +54,6 @@
                             <span slot="title">个人信息</span>
                         </template>
                         <el-menu-item index="5-1" @click="toUserInfo">查看个人信息</el-menu-item>
-                        <el-menu-item index="5-2">修改个人信息</el-menu-item>
                         <el-menu-item index="5-2">修改密码</el-menu-item>
                     </el-submenu>
                 </el-menu>
@@ -105,6 +104,9 @@ export default {
         },
         toBuyTicket(){
             this.$router.push('/buyTicket')
+        },
+        toAllOrder(){
+            this.$router.push('/allOrder')
         }
     }
 }

@@ -12,14 +12,13 @@
             <el-steps :active="active" align-center style="margin-top: 10px" finish-status="success">
                 <el-step title="添加乘客"></el-step>
                 <el-step title="选择座位"></el-step>
-                <el-step title="付款"></el-step>
-                <el-step title="订票成功"></el-step>
+                <el-step title="等待审核"></el-step>
             </el-steps>
 
             <el-button type="success" plain @click="addPassenger" v-show="active === 0">添加乘客</el-button>
 
             <el-table :data="passengerInfo" style="width: 1000px;margin-left: 80px;margin-top: 20px"
-                v-show="change && active === 0">
+                v-show="active === 0">
 
                 <el-table-column prop="passengerRealName" label="乘客姓名"></el-table-column>
                 <el-table-column prop="passengerPhoneNumber" label="乘客电话号码"></el-table-column>
@@ -74,10 +73,7 @@
                 </el-table-column>
             </el-table>
 
-            <span class="foot" v-show="change">
-                <el-button style="margin-top: 12px; " @click="prev">上一步</el-button>
-                <el-button style="margin-top: 12px; " @click="next">下一步</el-button>
-            </span>
+            
 
             <!-- 点击购买时的弹框 -->
             <el-dialog title="选座" :visible.sync="buyChange" width="40%" height="40%" :before-close="handleClose">
@@ -90,18 +86,18 @@
                         </el-select>
                     </el-form-item>
 
-                    <el-form-item label="始发站" >
+                    <el-form-item label="始发站">
                         <el-input placeholder="请输入始发站名称" v-model="startStationName">
                         </el-input>
                     </el-form-item>
 
-                     <el-form-item label="终点站" >
+                    <el-form-item label="终点站">
                         <el-input placeholder="请输入终点站名称" v-model="endStationName">
                         </el-input>
                     </el-form-item>
 
-                    <el-form-item label="车厢号" >
-                        <el-cascader :options="options" v-model="selectedOptions" >
+                    <el-form-item label="车厢号">
+                        <el-cascader :options="options" v-model="selectedOptions">
                         </el-cascader>
                     </el-form-item>
 
@@ -112,6 +108,23 @@
                     <el-button type="primary" @click="submitOrder">确 定</el-button>
                 </span>
             </el-dialog>
+
+            <el-dialog title="请确认好订单信息，如无疑问请支付!" :visible.sync="bian" width="40%" height="40%" :before-close="handleClose">
+                
+                <span slot="footer" class="footButton">
+                    <el-button @click="buyChange = false">取 消</el-button>
+                    <el-button type="primary" @click="pay">去支付</el-button>
+                </span>
+            </el-dialog>
+
+            <el-card v-show="change && active === 2">
+                <span class="a">购票成功，可以在订单中查看！</span>
+            </el-card>
+
+            <span class="foot" v-show="change">
+                <el-button style="margin-top: 12px; " @click="prev" v-show="first">上一步</el-button>
+                <el-button style="margin-top: 12px; " @click="next" v-show="last">下一步</el-button>
+            </span>
 
         </el-card>
     </div>
@@ -125,8 +138,11 @@ export default {
     data() {
         return {
             active: 0,
-            change: false,
+            change: true,
             buyChange: false,
+            bian:false,
+            last:true,
+            first:true,
             dialogTableVisible: false,
             passengerInfo: [{
                 passengerPhoneNumber: '',
@@ -180,7 +196,7 @@ export default {
                 value: '2',
                 label: '2号车厢',
                 children: [
-                   { value: 'A1', label: 'A1' },
+                    { value: 'A1', label: 'A1' },
                     { value: 'A2', label: 'A2' },
                     { value: 'A3', label: 'A3' },
                     { value: 'A4', label: 'A4' },
@@ -247,7 +263,7 @@ export default {
                 value: '5',
                 label: '5号车厢',
                 children: [
-                   { value: 'A1', label: 'A1' },
+                    { value: 'A1', label: 'A1' },
                     { value: 'A2', label: 'A2' },
                     { value: 'A3', label: 'A3' },
                     { value: 'A4', label: 'A4' },
@@ -278,7 +294,7 @@ export default {
                 value: '7',
                 label: '7号车厢',
                 children: [
-                     { value: 'A1', label: 'A1' },
+                    { value: 'A1', label: 'A1' },
                     { value: 'A2', label: 'A2' },
                     { value: 'A3', label: 'A3' },
                     { value: 'A4', label: 'A4' },
@@ -344,31 +360,37 @@ export default {
                 label: 'Z100'
             }],
             value: '',
-                startStationName:'',
-                endStationName:'',
-            order:{
-                userPhoneNumber:'',
-                passengerPhoneNumber:'',
-                passengerIdNumber:'',
-                tId:'',
-                startStationName:'',
-                endStationName:'',
-                carriageNo:'',
-                seatNo:'',
-                orderMoney:'',
-                orderCreateTime:'',
-                orderStatus:''
+            startStationName: '',
+            endStationName: '',
+            order: {
+                userPhoneNumber: '',
+                passengerPhoneNumber: '',
+                passengerIdNumber: '',
+                tId: '',
+                startStationName: '',
+                endStationName: '',
+                carriageNo: '',
+                seatNo: '',
+                orderMoney: '',
+                orderCreateTime: '',
+                orderStatus: ''
             }
         }
+    },
+    created() {
+        this.selectAllByUphone(this.$getSessionStorage('user').uPhone)
     },
     methods:
     {
         prev() {
             --this.active;
             if (this.active < 0) this.active = 0;
+            if(this.active==1) this.last=false;
+            if(this.active==0) this.last=true;
         },
         next() {
             if (this.active++ > 3) this.active = 0;
+            if(this.active==1) this.last=false;
         },
         addPassenger() {
             // this.change = true
@@ -384,9 +406,9 @@ export default {
         submitPassenger() {
 
             this.user = this.$getSessionStorage('user')
-            // console.log(this.user);
+            console.log(this.user);
 
-            this.passenger.uPhone = this.user.uphone;
+            this.passenger.uPhone = this.user.uPhone;
             console.log(this.passenger);
 
             if (this.passenger.passengerRealName == '') {
@@ -458,7 +480,7 @@ export default {
             }).then((response) => {
                 if (response.data == 1) {
                     this.$message.success("删除乘客成功！");
-                    this.selectAllByUphone(this.passenger.uPhone);
+                    this.selectAllByUphone(this.$getSessionStorage('user').uPhone);
                 } else {
                     this.$message.error("删除乘客失败！");
                 }
@@ -496,41 +518,45 @@ export default {
         },
         getRow2(row) {
             this.buyChange = true
-            this.order.passengerPhoneNumber=row.passengerPhoneNumber
-            this.order.passengerIdNumber=row.passengerIdNumber
+            this.order.passengerPhoneNumber = row.passengerPhoneNumber
+            this.order.passengerIdNumber = row.passengerIdNumber
             this.user = this.$getSessionStorage('user')
-            this.order.userPhoneNumber = this.user.uphone
-            
+            this.order.userPhoneNumber = this.user.uPhone
+
             console.log(this.startStationName);
-            
+
         },
 
         buyTicket() {
-           
+
         },
-       submitOrder(){
-            this.order.tId=this.value
-            this.order.startStationName=this.startStationName
-            this.order.endStationName=this.endStationName
-            this.order.carriageNo=this.selectedOptions[0]
-            this.order.seatNo=this.selectedOptions[1]
-            this.order.orderStatus=0
+        submitOrder() {
+            this.order.tId = this.value
+            this.order.startStationName = this.startStationName
+            this.order.endStationName = this.endStationName
+            this.order.carriageNo = this.selectedOptions[0]
+            this.order.seatNo = this.selectedOptions[1]
+            this.order.orderStatus = 0
             console.log(this.order);
-            
-             this.$axios.post('OrderListController/AddOrder', this.order)
+
+            this.$axios.post('OrderListController/AddOrder', this.order)
                 .then((response) => {
                     if (response.data == 1) {
-                       this.$message.success("生成订单成功！");
+                        
+                        this.bian=true
                     }
                 }).catch((err) => {
                     console.error(error);
                 });
 
-            // console.log(this.order);
-            
-            
-            
-        }
+        },
+        pay(){
+            this.$message.success("生成订单成功！");
+            this.bian=false
+            this.active++
+            this.buyChange=false
+            this.last=false;
+        },
     }
 }
 
@@ -557,6 +583,13 @@ export default {
 .foot {
     padding-left: 50%;
 }
+
+.a {
+    font-size: 40px;
+     left: 50%;
+    transform: translateX(-50%);
+}
+
 </style>
 
 

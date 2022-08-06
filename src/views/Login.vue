@@ -12,11 +12,11 @@
 			<!-- 表单区域 -->
 			<el-form label-width="0px" class="login_form" :model="user" :rules="rules" ref="loginFormRef">
 				<el-form-item prop="uname">
-					<el-input prefix-icon="el-icon-user-solid" placeholder="用户名" v-model="user.uname"></el-input>
+					<el-input prefix-icon="el-icon-user-solid" placeholder="用户名" v-model="user.uName"></el-input>
 				</el-form-item>
 
 				<el-form-item prop="upassword">
-					<el-input prefix-icon="el-icon-lock" type="password" placeholder="密码" v-model="user.upassword">
+					<el-input prefix-icon="el-icon-lock" type="password" placeholder="密码" v-model="user.uPassword">
 					</el-input>
 				</el-form-item>
 
@@ -34,16 +34,16 @@ export default {
 	data() {
 		return {
 			user: {
-				uname: '',
-				upassword: ''
+				uName: '',
+				uPassword: ''
 			},
 
 			// 校验规则
 			rules: {
-				uname: [
+				uName: [
 					{ required: true, message: '请输入用户名', trigger: 'blur' },
 				],
-				upassword: [
+				uPassword: [
 					{ required: true, message: '请输入密码', trigger: 'blur' }
 				]
 			},

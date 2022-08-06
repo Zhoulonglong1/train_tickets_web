@@ -10,6 +10,7 @@ import TrainParkingInfo from '../views/TrainParkingInfo'
 import TrainSearch from '../views/TrainSearch'
 import TrainTransfer from '../views/TrainTransfer'
 import BuyTicket from '../views/BuyTicket'
+import AllOrder from '../views/AllOrder'
 
 Vue.use(Router)
 
@@ -37,7 +38,8 @@ const router = new Router({
       {path:'/trainParkingInfo' , component:TrainParkingInfo},
       {path:'/trainSearch' , component:TrainSearch},
       {path:'/trainTransfer' , component:TrainTransfer},
-      {path:'/buyTicket' , component:BuyTicket}
+      {path:'/buyTicket' , component:BuyTicket},
+      {path:'/allOrder' , component:AllOrder}
     ]
     }
   ]
